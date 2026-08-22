@@ -8,6 +8,7 @@ import {
   RevealNoteInput,
 } from "../types/note.type.js";
 import { connectDB } from "../config/database.js";
+import { recordNoteEvent } from "./note-event.service.js";
 
 const getExpiryDate = (expiry: ExpiryOption): Date => {
   const now = new Date();
@@ -22,7 +23,7 @@ const getExpiryDate = (expiry: ExpiryOption): Date => {
       return new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
     case "7d":
-      return new Date(now.getTime() + 7 * 24 * 60 * 60 * 10000);
+      return new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
     default:
       throw new Error("Invalid expiry option");
@@ -80,6 +81,7 @@ export const createNote = async ({
         @passphraseHash
       )
     `);
+  await recordNoteEvent(token, "CREATED");
 
   return {
     token,
@@ -218,29 +220,24 @@ export const revealNote = async ({ token, passphrase }: RevealNoteInput) => {
   const burnResult = await pool
     .request()
     .input("token", sql.NVarChar(128), token).query(`
-      DELETE FROM dbo.Notes
+    DELETE FROM dbo.Notes
+    OUTPUT
+      DELETED.encryptedPayload,
+      DELETED.iv,
+      DELETED.authTag,
+      DELETED.expiresAt
+    WHERE token = @token
+      AND expiresAt > SYSUTCDATETIME()
+  `);
 
-      OUTPUT
-        DELETED.encryptedPayload,
-        DELETED.iv,
-        DELETED.authTag,
-        DELETED.expiresAt
-
-      WHERE token = @token
-        AND expiresAt > SYSUTCDATETIME()
-    `);
-
-  // No row deleted
   if (burnResult.recordset.length === 0) {
     return {
       status: "GONE" as const,
     };
   }
 
-  // ---------------------------------------
-  // STEP 6
-  // Get encrypted data
-  // ---------------------------------------
+  // Record that the note was burned
+  await recordNoteEvent(token, "BURNED");
 
   const deletedNote = burnResult.recordset[0];
 

@@ -2,19 +2,22 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import errorMiddleware from "./middleware/error.middleware.js";
 import { CLIENT_URL } from "./config/config.js";
-import noteRoutes from "./routes/note.route.js"
+import noteRoutes from "./routes/note.route.js";
+import dashboardRoutes from "./routes/dashboard.route.js";
 
 const app = express();
 
-app.use(cors({
-    origin : CLIENT_URL,
-    credentials : true
-}));
+app.use(
+  cors({
+    origin: CLIENT_URL,
+    credentials: true,
+  }),
+);
 app.use(express.json());
 
-
-
 app.use("/api/v1/notes", noteRoutes);
+app.use("/api/v1/dashboard", dashboardRoutes);
+
 
 app.get("/", (_req: Request, res: Response) => {
   res.json({
