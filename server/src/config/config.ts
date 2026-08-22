@@ -12,3 +12,4 @@ export const DB_DATABASE= process.env.DB_DATABASE
 export const DB_INSTANCE =process.env.DB_INSTANCE
 export const DB_ENCRYPT =process.env.DB_ENCRYPT
 export const DB_TRUST_SERVER_CERTIFICATE = process.env.DB_TRUST_SERVER_CERTIFICATE
+export const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
