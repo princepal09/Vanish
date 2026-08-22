@@ -5,3 +5,8 @@ export interface CreateNoteInput {
   expiry: ExpiryOption;
   passphrase?: string;
 }
+
+export interface RevealNoteInput {
+  token: string;
+  passphrase?: string;
+}
