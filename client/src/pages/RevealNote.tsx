@@ -50,8 +50,8 @@ const RevealNote = () => {
   const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(
     null,
   );
-  
-//   console.log("geel")
+
+  //   console.log("geel")
   console.log(attemptsRemaining);
 
   const {
@@ -90,8 +90,6 @@ const RevealNote = () => {
 
         const data = error.response?.data;
 
-
-        
         console.log("data", data);
 
         // Note gone
