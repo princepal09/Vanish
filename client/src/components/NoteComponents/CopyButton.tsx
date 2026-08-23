@@ -1,7 +1,4 @@
-import {
-  Check,
-  Copy,
-} from "lucide-react";
+import { Check, Copy } from "lucide-react";
 
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
@@ -13,11 +10,7 @@ interface CopyButtonProps {
   setCopied: (value: boolean) => void;
 }
 
-const CopyButton = ({
-  value,
-  copied,
-  setCopied,
-}: CopyButtonProps) => {
+const CopyButton = ({ value, copied, setCopied }: CopyButtonProps) => {
   const handleCopy = () => {
     setCopied(true);
 
@@ -27,10 +20,7 @@ const CopyButton = ({
   };
 
   return (
-    <CopyToClipboard
-      text={value}
-      onCopy={handleCopy}
-    >
+    <CopyToClipboard text={value} onCopy={handleCopy}>
       <Button
         type="button"
         variant="outline"

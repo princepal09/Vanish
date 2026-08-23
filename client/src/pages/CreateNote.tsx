@@ -85,7 +85,7 @@ const CreateNote = () => {
       {/* Background */}
 
       <div className="pointer-events-none absolute inset-0 z-0">
-        <div className="absolute left-1/2 top-0 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-white/[0.03] blur-3xl" />
+        <div className="absolute left-1/2 top-0 h-[500px]  -translate-x-1/2 rounded-full bg-white/[0.03] blur-3xl" />
       </div>
 
       <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-3xl flex-col px-4 py-10 sm:px-6 lg:py-16">
