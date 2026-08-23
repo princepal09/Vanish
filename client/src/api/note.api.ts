@@ -29,7 +29,7 @@ export const createNote = async (
   data: CreateNotePayload,
 ): Promise<CreateNoteResponse> => {
   const response = await api.post<CreateNoteResponse>("/notes", data);
-  console.log(response.data);
+  // console.log(response.data);
   return response.data;
 };
 

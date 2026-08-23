@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Shield, Lock, Clock, Copy, Check } from "lucide-react";
-
+import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -30,6 +30,7 @@ import { createNote } from "@/api/note.api";
 import { CreateNoteFormData, createNoteSchema } from "@/types/note.type";
 
 import CopyButton from "@/components/NoteComponents/CopyButton";
+import axios from "axios";
 
 const CreateNote = () => {
   const [generatedLink, setGeneratedLink] = useState("");
@@ -59,7 +60,7 @@ const CreateNote = () => {
     try {
       setGeneratedLink("");
       setCopied(false);
-      console.log(data);
+      // console.log(data);
 
       const response = await createNote({
         secret: data.secret,
@@ -75,11 +76,16 @@ const CreateNote = () => {
 
       // Clear sensitive data
       reset();
-    } catch (error) {
-      console.error("Create note failed:", error);
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        const data = error.response?.data;
+        if (status === 429) {
+          toast.error(data.message);
+        }
+      }
     }
   };
-
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-[#080808] text-white">
       {/* Background */}

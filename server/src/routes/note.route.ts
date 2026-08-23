@@ -1,13 +1,14 @@
 import { Router } from "express";
 import {
-    checkNoteController,
+  checkNoteController,
   createNoteController,
   revealNoteController,
 } from "../controllers/note.controller.js";
+import { noteCreationLimiter } from "../middleware/rateLimiter.middleware.js";
 
 const router = Router();
 
-router.post("/", createNoteController);
+router.post("/", noteCreationLimiter, createNoteController);
 router.post("/:token/reveal", revealNoteController);
 router.get("/:token", checkNoteController);
 
