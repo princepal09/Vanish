@@ -257,3 +257,39 @@ export const revealNote = async ({ token, passphrase }: RevealNoteInput) => {
     secret,
   };
 };
+
+export const checkNote = async (token: string) => {
+  const pool = await connectDB();
+
+  const result = await pool
+    .request()
+    .input("token", sql.NVarChar(128), token)
+    .query(
+      `SELECT token, expiresAt, passphraseHash FROM dbo.Notes Where token = @token`,
+    );
+
+  if (result.recordset.length === 0) {
+    return {
+      status: "GONE" as const,
+    };
+  }
+
+  const note = result.recordset[0];
+
+  if (new Date(note.expiresAt) <= new Date()) {
+    await pool.request().input("token", sql.NVarChar(128), token).query(`
+        DELETE FROM dbo.Notes
+        WHERE token = @token
+          AND expiresAt <= SYSUTCDATETIME()
+      `);
+
+    return {
+      status: "GONE" as const,
+    };
+  }
+
+  return {
+    status: "AVAILABLE" as const,
+    requiresPassphrase: !!note.passphrase,
+  };
+};

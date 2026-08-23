@@ -1,11 +1,14 @@
 import { Router } from "express";
-import { createNoteController, revealNoteController } from "../controllers/note.controller.js";
-
+import {
+    checkNoteController,
+  createNoteController,
+  revealNoteController,
+} from "../controllers/note.controller.js";
 
 const router = Router();
 
 router.post("/", createNoteController);
-router.post("/:token/reveal", revealNoteController)
-
+router.post("/:token/reveal", revealNoteController);
+router.get("/:token", checkNoteController);
 
 export default router;

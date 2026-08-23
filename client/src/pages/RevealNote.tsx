@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useParams } from "react-router-dom";
 
@@ -24,7 +24,7 @@ import { Input } from "@/components/ui/input";
 
 import { Label } from "@/components/ui/label";
 
-import { revealNote } from "@/api/note.api";
+import { checkNote, revealNote } from "@/api/note.api";
 
 import { z } from "zod";
 
@@ -34,14 +34,14 @@ const revealSchema = z.object({
 
 type RevealFormData = z.infer<typeof revealSchema>;
 
-type RevealState = "READY" | "REVEALED" | "GONE" | "ERROR";
+type RevealState = "CHECKING" | "READY" | "REVEALED" | "GONE" | "ERROR";
 
 const RevealNote = () => {
   const { token } = useParams<{
     token: string;
   }>();
 
-  const [state, setState] = useState<RevealState>("READY");
+  const [state, setState] = useState<RevealState>("CHECKING");
 
   const [secret, setSecret] = useState("");
 
@@ -51,7 +51,6 @@ const RevealNote = () => {
     null,
   );
 
-  //   console.log("geel")
   console.log(attemptsRemaining);
 
   const {
@@ -61,6 +60,31 @@ const RevealNote = () => {
   } = useForm<RevealFormData>({
     resolver: zodResolver(revealSchema),
   });
+
+  useEffect(() => {
+    const check = async () => {
+      if (!token) {
+        setState("GONE");
+        return;
+      }
+
+      try {
+        console.log("Checking note:", token);
+
+        await checkNote(token);
+
+        console.log("Note is available");
+
+        setState("READY");
+      } catch (error) {
+        console.log("Note check failed:", error);
+
+        setState("GONE");
+      }
+    };
+
+    void check();
+  }, [token]);
 
   const onSubmit = async (data: RevealFormData) => {
     if (!token) {
@@ -73,6 +97,7 @@ const RevealNote = () => {
       setAttemptsRemaining(null);
 
       const response = await revealNote(token, data.passphrase);
+
       console.log(response);
 
       if (response.success && response.data?.secret) {
@@ -126,9 +151,21 @@ const RevealNote = () => {
     }
   };
 
-  // ----------------------------------------
-  // GONE
-  // ----------------------------------------
+  if (state === "CHECKING") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#080808] px-4 text-white">
+        <div className="text-center">
+          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/[0.03]">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-700 border-t-white" />
+          </div>
+
+          <h1 className="text-lg font-medium">Checking secret</h1>
+
+          <p className="mt-2 text-sm text-zinc-600">Please wait...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (state === "GONE") {
     return (
@@ -149,10 +186,6 @@ const RevealNote = () => {
       </div>
     );
   }
-
-  // ----------------------------------------
-  // REVEALED
-  // ----------------------------------------
 
   if (state === "REVEALED") {
     return (
@@ -191,10 +224,6 @@ const RevealNote = () => {
     );
   }
 
-  // ----------------------------------------
-  // READY
-  // ----------------------------------------
-
   return (
     <div className="min-h-screen bg-[#080808] px-4 py-10 text-white">
       <div className="mx-auto flex min-h-[80vh] w-full max-w-md items-center">
@@ -212,6 +241,8 @@ const RevealNote = () => {
           </CardHeader>
 
           <CardContent>
+            {/* Warning */}
+
             <div className="mb-6 rounded-lg border border-yellow-500/10 bg-yellow-500/[0.03] p-4">
               <div className="flex gap-3">
                 <AlertTriangle className="h-5 w-5 shrink-0 text-yellow-500" />
@@ -223,7 +254,11 @@ const RevealNote = () => {
               </div>
             </div>
 
+            {/* Form */}
+
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              {/* Passphrase */}
+
               <div className="space-y-2">
                 <Label htmlFor="passphrase" className="text-zinc-200">
                   Passphrase
@@ -250,6 +285,8 @@ const RevealNote = () => {
                 )}
               </div>
 
+              {/* Error */}
+
               {errorMessage && (
                 <div className="rounded-lg border border-red-500/20 bg-red-500/[0.05] p-3">
                   <p className="text-sm text-red-400">{errorMessage}</p>
@@ -261,6 +298,8 @@ const RevealNote = () => {
                   )}
                 </div>
               )}
+
+              {/* Reveal Button */}
 
               <Button
                 type="submit"

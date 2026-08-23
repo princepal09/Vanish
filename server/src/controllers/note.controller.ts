@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
-import { createNote, revealNote } from "../services/note.service.js";
+import { checkNote, createNote, revealNote } from "../services/note.service.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { FRONTEND_URL } from "../config/config.js";
 
@@ -108,5 +108,30 @@ export const revealNoteController = asyncHandler(
 
     // Should never normally reach here
     throw new ApiError(500, "Unexpected reveal state");
+  },
+);
+
+export const checkNoteController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const token = req.params.token as string;
+    if (!token) {
+      throw new ApiError(400, "Token is required");
+    }
+
+    const result = await checkNote(token);
+
+    if (result.status === "GONE") {
+      throw new ApiError(404, "This note is gone");
+    }
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          requiresPassphrase: result.requiresPassphrase,
+        },
+        "Note is available",
+      ),
+    );
   },
 );

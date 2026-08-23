@@ -10,8 +10,7 @@ const App = () => {
 
   return (
     <>
-
-    {!isRevealPage && <Navbar/>}
+      {!isRevealPage && <Navbar />}
       <Routes>
         <Route path="/" element={<CreateNote />} />
         <Route path="/note/:token" element={<RevealNote />} />

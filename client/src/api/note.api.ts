@@ -48,3 +48,18 @@ export const revealNote = async (
 
   return response.data;
 };
+
+export interface CheckNoteResponse {
+  success: boolean;
+
+  data: {
+    requiresPassphrase: boolean;
+  };
+
+  message: string;
+}
+
+export const checkNote = async (token: string): Promise<CheckNoteResponse> => {
+  const response = await api.get(`/notes/${token}`);
+  return response.data;
+};
