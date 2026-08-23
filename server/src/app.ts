@@ -7,6 +7,8 @@ import dashboardRoutes from "./routes/dashboard.route.js";
 
 const app = express();
 
+// console.log(CLIENT_URL)
+
 app.use(
   cors({
     origin: CLIENT_URL,

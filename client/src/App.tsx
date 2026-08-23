@@ -1,11 +1,15 @@
-import { Button } from "@/components/ui/button"
+import { Routes, Route } from "react-router-dom";
 
-function App() {
+import CreateNote from "./pages/CreateNote";
+import RevealNote from "./pages/RevealNote";
+
+const App = () => {
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center">
-      <Button>Click me</Button>
-    </div>
-  )
-}
+    <Routes>
+      <Route path="/" element={<CreateNote />} />
+      <Route path="/note/:token" element={<RevealNote />} />
+    </Routes>
+  );
+};
 
-export default App
+export default App;

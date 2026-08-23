@@ -9,6 +9,8 @@ export const createNoteController = asyncHandler(
   async (req: Request, res: Response) => {
     const { secret, expiry, passphrase } = req.body;
 
+    console.log(secret, expiry, passphrase);
+
     if (!secret || typeof secret !== "string") {
       throw new ApiError(400, "Secret is required");
     }
