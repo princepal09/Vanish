@@ -19,7 +19,7 @@ export const createNoteController = asyncHandler(
       throw new ApiError(400, "Expiry is required");
     }
 
-    const allowedExpires = ["5m", "1h", "24d", "7d"];
+    const allowedExpires = ["5m", "1h", "24h", "7d"];
 
     if (!allowedExpires.includes(expiry)) {
       throw new ApiError(400, "Invalid Expiry Option");
